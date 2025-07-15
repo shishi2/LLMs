@@ -1,3 +1,5 @@
 __py*
 *.pth
 ch05/gpt2/
+ch05/Llama*
+sms_spam*
