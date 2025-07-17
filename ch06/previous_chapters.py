@@ -318,3 +318,32 @@ def text_to_token_ids(text, tokenizer):
 def token_ids_to_text(token_ids, tokenizer):
     flat = token_ids.squeeze(0)  # remove batch dimension
     return tokenizer.decode(flat.tolist())
+
+
+def classify_review(text, model, tokenizer, device, max_length=None, pad_token_id=50256):
+	model.eval()
+
+	input_ids = tokenizer.encode(text)
+	supported_context_length = model.pos_emb.weight.shape[0]
+
+	input_ids = input_ids[:min(max_length, supported_context_length)]
+	assert max_length is not None, (
+		"必须指定max_length 若要使用完整的模型上下文context"
+		"pass max_length=model.pos_emb.weight.shape[0]."
+	)
+	assert max_length <= supported_context_length, (
+		f"max_length ({max_length}) exceeds model's supported context length ({supported_context_length})."
+	)
+	# 以下实现更优秀
+	# max_len = min(max_length,supported_context_length) if max_length else supported_context_length
+	# input_ids = input_ids[:max_len]
+
+	# padding
+	input_ids += [pad_token_id] * (max_length - len(input_ids))
+	input_tensor = torch.tensor(input_ids, device=device).unsqueeze(0)
+
+	with torch.no_grad():
+		logits = model(input_tensor)[:, -1, :]
+	predicted_label = torch.argmax(logits, dim=-1)
+
+	return "spam" if predicted_label == 1 else "not spam"

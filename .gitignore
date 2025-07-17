@@ -3,3 +3,7 @@ __py*
 ch05/gpt2/
 ch05/Llama*
 sms_spam*
+
+# ignore chainlit
+.file*
+.chain*
