@@ -3,6 +3,8 @@
 #   - https://www.manning.com/books/build-a-large-language-model-from-scratch
 # Code: https://github.com/rasbt/LLMs-from-scratch
 
+# chainlit run app.py
+
 from pathlib import Path
 import sys
 
